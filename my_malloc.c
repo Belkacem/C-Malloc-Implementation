@@ -54,7 +54,7 @@ metadata_t* freelist[8];
 
 void* my_malloc(size_t size)
 {
-  /* FIX ME */
+  if (size + sizeof(metadata_t) > 2048) return NULL;
   return NULL;
 }
 
