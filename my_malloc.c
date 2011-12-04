@@ -54,6 +54,9 @@ metadata_t* freelist[8];
 
 void* my_malloc(size_t size)
 {
+  printf("Requested size: %d bytes\n", size);
+  printf(" Metadata size: %d bytes\n", sizeof(metadata_t));
+
   if (size + sizeof(metadata_t) > 2048) return NULL;
   
   if (!heap) heap = my_sbrk(SBRK_SIZE);
