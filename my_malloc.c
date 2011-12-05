@@ -113,8 +113,12 @@ void* my_malloc(size_t size)
     freelist[available] = current;
   }
 
+  metadata_t *ret_meta = freelist[index];
+  freelist[index] = freelist[index]->next;
+  freelist[index]->prev = NULL;
+  ret_meta->next = NULL;
 
-  return NULL;
+  return ret_meta;
 }
 
 void init_heap() {
