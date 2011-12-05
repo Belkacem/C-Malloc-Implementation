@@ -51,7 +51,6 @@ metadata_t* freelist[8];
  * freelist[7] -> 2048
  */
 
-void init_heap();
 
 void* my_malloc(size_t size)
 {
@@ -61,6 +60,16 @@ void* my_malloc(size_t size)
   if (size + sizeof(metadata_t) > 2048) return NULL;
   
   if (!heap) init_heap();
+
+  int needed = size + sizeof(metadata_t);
+  int m_size = 16;
+  int index = 0;
+
+  while (m_size < needed) {
+    m_size *= 2;
+    index++;
+  }
+
   return NULL;
 }
 
