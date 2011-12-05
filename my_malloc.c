@@ -51,6 +51,7 @@ metadata_t* freelist[8];
  * freelist[7] -> 2048
  */
 
+void init_heap();
 
 void* my_malloc(size_t size)
 {
@@ -59,10 +60,17 @@ void* my_malloc(size_t size)
 
   if (size + sizeof(metadata_t) > 2048) return NULL;
   
-  if (!heap) {
-    heap = (metadata_t) my_sbrk(SBRK_SIZE);
-  }
+  if (!heap) init_heap();
   return NULL;
+}
+
+void init_heap() {
+  heap = my_sbrk(SBRK_SIZE);
+  freelist[7] = (metadata_t *) heap;
+  freelist[7]->in_use = 0;
+  freelist[7]->size = 2048;
+  freelist[7]->next = NULL;
+  freelist[7]->prev = NULL; 
 }
 
 void* my_realloc(void* ptr, size_t new_size)

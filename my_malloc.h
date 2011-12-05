@@ -63,4 +63,6 @@ void* my_memcpy(void *, const void *, size_t);
  */
 void* my_sbrk(int);
 
+void init_heap();
+
 #endif /* __MY_MALLOC_H__ */
