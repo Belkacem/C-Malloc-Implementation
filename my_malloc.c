@@ -56,6 +56,7 @@ void* my_malloc(size_t size)
 {
   fprintf(stderr, "Requested size: %d bytes\n", size);
   fprintf(stderr, " Metadata size: %d bytes\n", sizeof(metadata_t));
+  fprintf(stderr, "   Size needed: %d bytes\n", size+sizeof(metadata_t));
 
   if (size + sizeof(metadata_t) > 2048) return NULL;
   
@@ -69,6 +70,8 @@ void* my_malloc(size_t size)
     m_size *= 2;
     index++;
   }
+
+  fprintf(stderr, "Index of freelist: %d\n", index);
 
   return NULL;
 }
