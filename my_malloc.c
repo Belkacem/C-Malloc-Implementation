@@ -72,6 +72,13 @@ void* my_malloc(size_t size)
   }
 
   fprintf(stderr, "Index of freelist: %d\n", index);
+  
+  int try = index;
+  while (!freelist[try]) {
+    try++;
+  }
+
+  fprintf(stderr, "Next available free memory: %d\n", try);
 
   return NULL;
 }
