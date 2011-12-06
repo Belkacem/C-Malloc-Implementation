@@ -141,6 +141,12 @@ int get_index(size_t needed) {
 void* my_realloc(void* ptr, size_t new_size)
 {
   void *new = my_malloc(new_size);
+  if (ptr == NULL) return new;
+  if (new_size == 0) {
+    my_free(ptr);
+    return NULL;
+  }
+  
   metadata_t *old = (metadata_t *) ((char *) ptr - sizeof(metadata_t));
   my_memcpy(new, ptr, old->size - sizeof(metadata_t));
   my_free(ptr);
