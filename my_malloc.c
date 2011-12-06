@@ -170,9 +170,11 @@ void my_free(void* ptr)
     index++;
   }
   
-  metadata_t *front = freelist[index];
-  md->next = front;
-  front->prev = md;
+  if (freelist[index]) {
+    metadata_t *front = freelist[index];
+    md->next = front;
+    front->prev = md;
+  }
   freelist[index] = md;
 }
 
