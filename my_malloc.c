@@ -91,10 +91,12 @@ void* my_malloc(size_t size)
 
   fprintf(stderr, "Next available free memory: %d\n", available);
 
+  metadata_t *current, *new;
   while (available != index) {
-    metadata_t *current = freelist[available];
-    metadata_t *new = current + (current->size / 2);
+    current = freelist[available];
     current->size /= 2;
+
+    new = current + current->size;
     new->size = current->size;
 
     if (freelist[available]->next) {
