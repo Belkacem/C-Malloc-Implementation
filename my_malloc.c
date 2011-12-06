@@ -95,7 +95,7 @@ void* my_malloc(size_t size)
     metadata_t *current = freelist[available];
     metadata_t *new = current + (current->size / 2);
     current->size /= 2;
-    new->size /= 2;
+    new->size = current->size;
 
     if (freelist[available]->next) {
       freelist[available] = freelist[available]->next;
