@@ -54,15 +54,15 @@ metadata_t* freelist[8];
 
 void* my_malloc(size_t size)
 {
+  int needed = size + sizeof(metadata_t);
+
   fprintf(stderr, "Requested size: %d bytes\n", size);
   fprintf(stderr, " Metadata size: %d bytes\n", sizeof(metadata_t));
-  fprintf(stderr, "   Size needed: %d bytes\n", size+sizeof(metadata_t));
+  fprintf(stderr, "   Size needed: %d bytes\n", needed);
 
-  if (size + sizeof(metadata_t) > 2048) return NULL;
-  
+  if (needed > 2048) return NULL; 
   if (!heap) init_heap();
 
-  int needed = size + sizeof(metadata_t);
   int m_size = 16;
   int index = 0;
 
