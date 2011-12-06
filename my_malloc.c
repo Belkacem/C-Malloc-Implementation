@@ -81,7 +81,10 @@ void* my_malloc(size_t size)
     } else {
       freelist[index] = NULL;
     }
-    return current+sizeof(metadata_t);
+    
+    void *repos = (void *) ((char *) current + sizeof(metadata_t));
+    
+    return repos;
   }
 
   int available = index;
@@ -117,7 +120,9 @@ void* my_malloc(size_t size)
   freelist[index]->prev = NULL;
   ret_meta->next = NULL;
 
-  return ret_meta+sizeof(metadata_t);
+  void *repos = (void *) ((char *) ret_meta + sizeof(metadata_t));
+
+  return repos;
 }
 
 void init_heap() {
@@ -143,16 +148,17 @@ int get_index(size_t needed) {
 void* my_realloc(void* ptr, size_t new_size)
 {
   void *new = my_malloc(new_size);
-  metadata_t *old = ptr;
-  my_memcpy(new, old, (old-sizeof(metadata_t))->size - sizeof(metadata_t));
+  metadata_t *old = (metadata_t *) ((char *) ptr - sizeof(metadata_t));
+  my_memcpy(new, ptr, old->size - sizeof(metadata_t));
   my_free(ptr);
-  return new;
+
+  void *repos = (void *) ((char *) new + sizeof(metadata_t));
+  return repos;
 }
 
 void my_free(void* ptr)
 {
-  metadata_t *md = ptr;
-  md-=sizeof(metadata_t);
+  metadata_t *md = (metadata_t *) ((char *) ptr - sizeof(metadata_t));
 
   md->in_use = 0;
 
