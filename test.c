@@ -18,5 +18,12 @@ int main() {
 
         my_free(a);
 
+        char *c;
+        char d[] = "iz thiz workingz?";
+        c = my_malloc(sizeof(char)*strlen(d));
+
+        printf("%s\n", c);
+        printf("%s\n", d);
+
 	return 0;
 }
