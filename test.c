@@ -26,5 +26,12 @@ int main() {
         printf("%s\n", c);
         printf("%s\n", d);
 
+        char e[] = "10 Home\n20 Sweet\n30 GOTO 10";
+        c = my_realloc(c, sizeof(char)*strlen(d));
+        strncpy(c, e, strlen(e));
+
+        printf("%s\n", c);
+        printf("%s\n", e);
+
 	return 0;
 }
