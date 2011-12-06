@@ -10,8 +10,8 @@ int main() {
 	 
         char *a;
         char b[] = "hello peepz";
-        a = my_malloc(sizeof(char)*20);
-        strncpy(a, b, 20);
+        a = my_malloc(sizeof(char)*strlen(b));
+        strncpy(a, b, strlen(b));
 
         printf("%s\n", a);
         printf("%s\n", b);
