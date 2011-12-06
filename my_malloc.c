@@ -63,13 +63,7 @@ void* my_malloc(size_t size)
   if (needed > 2048) return NULL; 
   if (!heap) init_heap();
 
-  int m_size = 16;
-  int index = 0;
-
-  while (m_size < needed) {
-    m_size *= 2;
-    index++;
-  }
+  int index = get_index(size);
 
   fprintf(stderr, "Index of freelist: %d\n", index);
   
@@ -128,6 +122,17 @@ void init_heap() {
   freelist[7]->size = 2048;
   freelist[7]->next = NULL;
   freelist[7]->prev = NULL; 
+}
+
+int get_index(size_t needed) {
+  int index = 0;
+  int memory = 16;
+  while (memory < needed) {
+    memory *= 2;
+    index++;
+  }
+
+  return index;
 }
 
 void* my_realloc(void* ptr, size_t new_size)

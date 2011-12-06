@@ -64,5 +64,6 @@ void* my_memcpy(void *, const void *, size_t);
 void* my_sbrk(int);
 
 void init_heap();
+int get_index(size_t);
 
 #endif /* __MY_MALLOC_H__ */
