@@ -61,13 +61,14 @@ void* my_malloc(size_t size)
 
   int index = get_index(size);
 
+  metadata_t *front, *next;
   if (freelist[index]) {
-    metadata_t *current = freelist[index];
-    metadata_t *next = freelist[index]->next;
+    front = freelist[index];
+    next = front->next;
     
-    current->in_use = 1;
-    current->next = NULL;
-    current->prev = NULL;
+    front->in_use = 1;
+    front->next = NULL;
+    front->prev = NULL;
 
     if (next) {
       next->prev = NULL;
@@ -76,7 +77,7 @@ void* my_malloc(size_t size)
       freelist[index] = NULL;
     }
     
-    void *repos = (void *) ((char *) current + sizeof(metadata_t));
+    void *repos = (void *) ((char *) front + sizeof(metadata_t));
     
     return repos;
   }
