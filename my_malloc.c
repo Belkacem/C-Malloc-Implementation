@@ -164,6 +164,10 @@ metadata_t* find_buddy(metadata_t* ptr){
 
 void* my_memcpy(void* dest, const void* src, size_t num_bytes)
 {
-  /* FIX ME */
-  return dest;
+  metadata_t *d = dest;
+  const metadata_t *s = src;
+  for (int i=0; i<num_bytes; i++) {
+    d[i]=s[i];
+  }
+  return (void *) d;
 }
