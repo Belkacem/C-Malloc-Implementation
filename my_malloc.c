@@ -139,6 +139,8 @@ void* my_realloc(void* ptr, size_t new_size)
 void my_free(void* ptr)
 {
   metadata_t *md = ptr;
+  md-=12;
+
   md->in_use = 0;
 
   int m_size = 16;
