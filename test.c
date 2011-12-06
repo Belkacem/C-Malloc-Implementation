@@ -21,6 +21,7 @@ int main() {
         char *c;
         char d[] = "iz thiz workingz?";
         c = my_malloc(sizeof(char)*strlen(d));
+        strncpy(c, d, strlen(d));
 
         printf("%s\n", c);
         printf("%s\n", d);
