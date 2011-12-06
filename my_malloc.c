@@ -56,17 +56,11 @@ void* my_malloc(size_t size)
 {
   int needed = size + sizeof(metadata_t);
 
-  fprintf(stderr, "Requested size: %d bytes\n", size);
-  fprintf(stderr, " Metadata size: %d bytes\n", sizeof(metadata_t));
-  fprintf(stderr, "   Size needed: %d bytes\n", needed);
-
   if (needed > 2048) return NULL; 
   if (!heap) init_heap();
 
   int index = get_index(size);
 
-  fprintf(stderr, "Index of freelist: %d\n", index);
-  
   if (freelist[index]) {
     metadata_t *current = freelist[index];
     metadata_t *next = freelist[index]->next;
@@ -91,8 +85,6 @@ void* my_malloc(size_t size)
   while (!freelist[available]) {
     available++;
   }
-
-  fprintf(stderr, "Next available free memory: %d\n", available);
 
   metadata_t *current, *new;
   while (available != index) {
