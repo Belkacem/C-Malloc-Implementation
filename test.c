@@ -16,5 +16,7 @@ int main() {
         printf("%s\n", a);
         printf("%s\n", b);
 
+        my_free(a);
+
 	return 0;
 }
