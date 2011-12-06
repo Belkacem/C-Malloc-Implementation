@@ -118,7 +118,7 @@ void* my_malloc(size_t size)
   freelist[index]->prev = NULL;
   ret_meta->next = NULL;
 
-  return ret_meta;
+  return ret_meta+12;
 }
 
 void init_heap() {
