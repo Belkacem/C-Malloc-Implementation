@@ -81,7 +81,7 @@ void* my_malloc(size_t size)
     } else {
       freelist[index] = NULL;
     }
-    return current;
+    return current+12;
   }
 
   int available = index;
