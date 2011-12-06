@@ -142,7 +142,7 @@ void* my_realloc(void* ptr, size_t new_size)
 {
   void *new = my_malloc(new_size);
   metadata_t *old = ptr;
-  my_memcpy(new, old, old->size - sizeof(metadata_t));
+  my_memcpy(new, old, (old-12)->size - sizeof(metadata_t));
   my_free(ptr);
   return new;
 }
