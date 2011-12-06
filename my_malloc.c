@@ -81,7 +81,7 @@ void* my_malloc(size_t size)
     } else {
       freelist[index] = NULL;
     }
-    return current+12;
+    return current+sizeof(metadata_t);
   }
 
   int available = index;
@@ -115,7 +115,7 @@ void* my_malloc(size_t size)
   freelist[index]->prev = NULL;
   ret_meta->next = NULL;
 
-  return ret_meta+12;
+  return ret_meta+sizeof(metadata_t);
 }
 
 void init_heap() {
@@ -142,7 +142,7 @@ void* my_realloc(void* ptr, size_t new_size)
 {
   void *new = my_malloc(new_size);
   metadata_t *old = ptr;
-  my_memcpy(new, old, (old-12)->size - sizeof(metadata_t));
+  my_memcpy(new, old, (old-sizeof(metadata_t))->size - sizeof(metadata_t));
   my_free(ptr);
   return new;
 }
@@ -150,7 +150,7 @@ void* my_realloc(void* ptr, size_t new_size)
 void my_free(void* ptr)
 {
   metadata_t *md = ptr;
-  md-=12;
+  md-=sizeof(metadata_t);
 
   md->in_use = 0;
 
