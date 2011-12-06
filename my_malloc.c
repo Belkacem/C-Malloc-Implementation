@@ -144,8 +144,7 @@ void* my_realloc(void* ptr, size_t new_size)
   my_memcpy(new, ptr, old->size - sizeof(metadata_t));
   my_free(ptr);
 
-  void *repos = (void *) ((char *) new + sizeof(metadata_t));
-  return repos;
+  return new;
 }
 
 void my_free(void* ptr)
