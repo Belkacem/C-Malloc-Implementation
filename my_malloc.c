@@ -182,5 +182,5 @@ void* my_memcpy(void* dest, const void* src, size_t num_bytes)
   for (int i=0; i<num_bytes; i++) {
     d[i]=s[i];
   }
-  return (void *) d;
+  return d;
 }
