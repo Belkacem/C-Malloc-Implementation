@@ -75,9 +75,12 @@ void* my_malloc(size_t size)
     current->next = NULL;
     current->prev = NULL;
 
-    next->prev = NULL;
-    freelist[index] = next;
-
+    if (next) {
+      next->prev = NULL;
+      freelist[index] = next;
+    } else {
+      freelist[index] = NULL;
+    }
     return current;
   }
 
