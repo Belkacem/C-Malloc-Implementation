@@ -138,7 +138,21 @@ void* my_realloc(void* ptr, size_t new_size)
 
 void my_free(void* ptr)
 {
-  /* FIX ME */
+  metadata_t *md = ptr;
+  md->in_use = 0;
+
+  int m_size = 16;
+  int index = 0;
+
+  while (m_size < md->size) {
+    m_size *= 2;
+    index++;
+  }
+  
+  metadata_t *front = freelist[index];
+  md->next = front;
+  front->prev = md;
+  freelist[index] = md;
 }
 
 metadata_t* find_buddy(metadata_t* ptr){
