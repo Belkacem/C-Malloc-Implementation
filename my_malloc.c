@@ -57,7 +57,7 @@ void* my_malloc(size_t size)
   int needed = size + sizeof(metadata_t);
 
   if (needed > 2048) return NULL; 
-  if (!heap) init_heap();
+  if (!heap || size > 1024) init_heap();
 
   int index = get_index(size);
 
