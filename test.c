@@ -33,5 +33,8 @@ int main() {
         printf("%s\n", c);
         printf("%s\n", e);
 
+        // Free everything
+        my_free(c);
+
 	return 0;
 }
