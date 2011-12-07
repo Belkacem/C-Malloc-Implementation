@@ -59,7 +59,7 @@ void* my_malloc(size_t size)
   if (needed > 2048) return NULL; 
   if (!heap || size > 1024) init_heap();
 
-  int index = get_index(size);
+  int index = get_index(needed);
 
   metadata_t *front, *next;
   if (freelist[index]) {
@@ -86,7 +86,7 @@ void* my_malloc(size_t size)
   while (!freelist[available]) {
     available++;
   }
-
+  
   metadata_t *current, *new;
   while (available != index) {
     current = freelist[available];
@@ -164,6 +164,7 @@ void my_free(void* ptr)
   md->in_use = 0;
 
   metadata_t *buddy = find_buddy(md);
+  
   int fl_index = 0;
   while (!buddy->in_use &&
          md->size == buddy->size) {
@@ -206,7 +207,6 @@ void my_free(void* ptr)
 metadata_t* find_buddy(metadata_t* ptr){
   int buddy = (int) ptr ^ ptr->size;
   metadata_t *b = (metadata_t *) buddy;
-
   return b;
 }
 
