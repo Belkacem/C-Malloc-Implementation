@@ -158,14 +158,21 @@ void my_free(void* ptr)
 {
   metadata_t *md = (metadata_t *) ((char *) ptr - sizeof(metadata_t));
 
-  md->in_use = 0;
-
   int m_size = 16;
   int index = 0;
 
   metadata_t *buddy = find_buddy(md);
-  if (buddy) {
+  while (buddy && !buddy->in_use &&
+         buddy->size < 2048 && buddy->size &&
+         md->size < 2048) {
+    if (buddy < md) {
+      md = buddy;
+    }
+    md->size *= 2;
+    buddy = find_buddy(md);
   }
+
+  md->in_use = 0;
 
   while (m_size < md->size) {
     m_size *= 2;
@@ -181,24 +188,10 @@ void my_free(void* ptr)
 }
 
 metadata_t* find_buddy(metadata_t* ptr){
-  int size = ptr->size;
-  int bit;
-  switch (size) {
-    case 16:   bit = 4; break;
-    case 32:   bit = 5; break;
-    case 64:   bit = 6; break;
-    case 128:  bit = 7; break;
-    case 256:  bit = 8; break;
-    case 512:  bit = 9; break;
-    case 1024: bit = 10; break;
-    default: bit = 0;
-  }
+  int buddy = (int) ptr ^ ptr->size;
+  metadata_t *b = (metadata_t *) buddy;
 
-  int mask = 1 << bit;
-  int ptr2 = (int) ptr;
-  ptr2 ^= mask;
-
-  return (metadata_t*) ptr2;
+  return b;
 }
 
 void* my_memcpy(void* dest, const void* src, size_t num_bytes)
