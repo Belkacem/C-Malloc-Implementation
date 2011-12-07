@@ -112,6 +112,7 @@ void* my_malloc(size_t size)
   freelist[index] = freelist[index]->next;
   freelist[index]->prev = NULL;
   ret_meta->next = NULL;
+  ret_meta->in_use = 1;
 
   void *repos = (void *) ((char *) ret_meta + sizeof(metadata_t));
 
@@ -136,6 +137,14 @@ int get_index(size_t needed) {
   }
 
   return index;
+}
+
+void print_freelist() {
+  int size = 16;
+  for (int i=0; i<8; i++) {
+    fprintf(stderr, "[%d] -> %d: %p\n", i, size, (void *) freelist[i]);
+    size *= 2;
+  }
 }
 
 void* my_realloc(void* ptr, size_t new_size)
@@ -164,7 +173,7 @@ void my_free(void* ptr)
   md->in_use = 0;
 
   metadata_t *buddy = find_buddy(md);
-  
+
   int fl_index = 0;
   while (!buddy->in_use &&
          md->size == buddy->size) {
@@ -174,10 +183,10 @@ void my_free(void* ptr)
     if (buddy->next == NULL && buddy->prev == NULL) {
       freelist[fl_index] = NULL;
     }
-
+    
     if (buddy->next && buddy->prev) {
-      buddy->prev = buddy->next;
-      buddy->next = buddy->prev;
+      buddy->prev->next = buddy->next;
+      buddy->next->prev = buddy->prev;
     } else if (buddy->next) {
       buddy->next->prev = NULL;
     } else if (buddy->prev) {
@@ -202,6 +211,8 @@ void my_free(void* ptr)
     front->prev = md;
   }
   freelist[index] = md;
+
+  print_freelist();
 }
 
 metadata_t* find_buddy(metadata_t* ptr){
@@ -212,8 +223,8 @@ metadata_t* find_buddy(metadata_t* ptr){
 
 void* my_memcpy(void* dest, const void* src, size_t num_bytes)
 {
-  metadata_t *d = dest;
-  const metadata_t *s = src;
+  char *d = (char *) dest;
+  char *s = (char *) src;
   for (int i=0; i<num_bytes; i++) {
     d[i]=s[i];
   }

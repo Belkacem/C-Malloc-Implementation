@@ -65,5 +65,5 @@ void* my_sbrk(int);
 
 void init_heap();
 int get_index(size_t);
-
+void print_freelist();
 #endif /* __MY_MALLOC_H__ */
