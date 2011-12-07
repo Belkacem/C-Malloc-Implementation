@@ -161,6 +161,8 @@ void my_free(void* ptr)
   int m_size = 16;
   int index = 0;
 
+  md->in_use = 0;
+
   metadata_t *buddy = find_buddy(md);
   while (buddy && !buddy->in_use &&
          buddy->size < 2048 && buddy->size &&
@@ -182,8 +184,6 @@ void my_free(void* ptr)
     md->size *= 2;
     buddy = find_buddy(md);
   }
-
-  md->in_use = 0;
 
   while (m_size < md->size) {
     m_size *= 2;
