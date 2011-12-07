@@ -164,7 +164,8 @@ void my_free(void* ptr)
   metadata_t *buddy = find_buddy(md);
   while (buddy && !buddy->in_use &&
          buddy->size < 2048 && buddy->size &&
-         md->size < 2048) {
+         md->size < 2048 && 
+         md->size == buddy->size) {
     if (buddy < md) {
       md = buddy;
     }
