@@ -164,10 +164,15 @@ void my_free(void* ptr)
   md->in_use = 0;
 
   metadata_t *buddy = find_buddy(md);
-  while (buddy && !buddy->in_use &&
-         buddy->size < 2048 && buddy->size &&
-         md->size < 2048 && 
+  int fl_index = 0;
+  while (!buddy->in_use &&
          md->size == buddy->size) {
+    
+    fl_index = get_index(buddy->size);
+
+    if (buddy->next == NULL && buddy->prev == NULL) {
+      freelist[fl_index] = NULL;
+    }
 
     if (buddy->next && buddy->prev) {
       buddy->prev = buddy->next;
