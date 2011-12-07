@@ -58,6 +58,16 @@ void* my_malloc(size_t size)
 
   if (needed > 2048) return NULL; 
   if (!heap || size > 1024) init_heap();
+  if (size > 1024) {
+    metadata_t *new_heap = my_sbrk(SBRK_SIZE);
+    new_heap->in_use = 0;
+    new_heap->size = 2048;
+    new_heap->next = NULL;
+    new_heap->prev = NULL;
+    if (freelist[7]) freelist[7]->next = new_heap;
+    else freelist[7] = new_heap;
+    print_freelist();
+  }
 
   int index = get_index(needed);
 
@@ -147,6 +157,16 @@ void print_freelist() {
   }
 }
 
+void print_block(metadata_t *block) {
+  fprintf(stderr, "Printing block data\n");
+  fprintf(stderr, "address: %p\n", (void *) block);
+  fprintf(stderr, "in use: %d\n", block->in_use);
+  fprintf(stderr, "size: %d\n", block->size);
+  fprintf(stderr, "next: %p\n", (void *) block->next);
+  fprintf(stderr, "prev: %p\n", (void *) block->prev);
+  fprintf(stderr, "\n");
+}
+
 void* my_realloc(void* ptr, size_t new_size)
 {
   void *new = my_malloc(new_size);
@@ -177,7 +197,7 @@ void my_free(void* ptr)
   int fl_index = 0;
   while (!buddy->in_use &&
          md->size == buddy->size) {
-    
+   
     fl_index = get_index(buddy->size);
 
     if (buddy->next == NULL && buddy->prev == NULL) {
@@ -198,13 +218,14 @@ void my_free(void* ptr)
     }
     md->size *= 2;
     buddy = find_buddy(md);
+
   }
 
   while (m_size < md->size) {
     m_size *= 2;
     index++;
-  }
-  
+  } 
+
   if (freelist[index]) {
     metadata_t *front = freelist[index];
     md->next = front;
@@ -212,7 +233,6 @@ void my_free(void* ptr)
   }
   freelist[index] = md;
 
-  print_freelist();
 }
 
 metadata_t* find_buddy(metadata_t* ptr){
