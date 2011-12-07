@@ -166,6 +166,16 @@ void my_free(void* ptr)
          buddy->size < 2048 && buddy->size &&
          md->size < 2048 && 
          md->size == buddy->size) {
+
+    if (buddy->next && buddy->prev) {
+      buddy->prev = buddy->next;
+      buddy->next = buddy->prev;
+    } else if (buddy->next) {
+      buddy->next->prev = NULL;
+    } else if (buddy->prev) {
+      buddy->prev->next = NULL;
+    }
+
     if (buddy < md) {
       md = buddy;
     }
