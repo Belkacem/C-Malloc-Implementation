@@ -324,6 +324,11 @@ metadata_t* find_buddy(metadata_t* ptr){
   else return NULL;
 }
 
+/* Do a byte by byte copy. Make sure to cast the pointers
+   as chars so you copy bytes and nothing larger. Loop through
+   the amount of bytes you want:
+        metadata_t->size - sizeof(metadata_t)
+   */
 void* my_memcpy(void* dest, const void* src, size_t num_bytes)
 {
   char *d = (char *) dest;
