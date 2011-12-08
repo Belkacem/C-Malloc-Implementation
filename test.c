@@ -3,11 +3,6 @@
 #include <stdio.h>
 
 int main() {
-	
-	/*
-	 * Test code goes here
-	 */
-	 
         char *a;
         char b[] = "hello peepz";
         printf("String of size %d:\n",strlen(b));

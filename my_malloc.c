@@ -55,7 +55,7 @@ metadata_t* freelist[8];
 void* my_malloc(size_t size)
 {
   int needed = size + sizeof(metadata_t);
-
+  
   if (needed > 2048) return NULL; 
   if (!heap || size > 1024) init_heap();
   if (size > 1024) {
@@ -66,7 +66,6 @@ void* my_malloc(size_t size)
     new_heap->prev = NULL;
     if (freelist[7]) freelist[7]->next = new_heap;
     else freelist[7] = new_heap;
-    print_freelist();
   }
 
   int index = get_index(needed);
@@ -88,7 +87,6 @@ void* my_malloc(size_t size)
     }
     
     void *repos = (void *) ((char *) front + sizeof(metadata_t));
-    
     return repos;
   }
 
@@ -96,6 +94,7 @@ void* my_malloc(size_t size)
   while (!freelist[available]) {
     available++;
   }
+
   
   metadata_t *current, *new;
   while (available != index) {
@@ -169,17 +168,20 @@ void print_block(metadata_t *block) {
 
 void* my_realloc(void* ptr, size_t new_size)
 {
-  void *new = my_malloc(new_size);
-  if (ptr == NULL) return new;
+  void *new;
   if (new_size == 0) {
     my_free(ptr);
     return NULL;
   }
-  
+
+  new = my_malloc(new_size);
+  if (ptr == NULL) return new;
+ 
   metadata_t *old = (metadata_t *) ((char *) ptr - sizeof(metadata_t));
   my_memcpy(new, ptr, old->size - sizeof(metadata_t));
   my_free(ptr);
 
+  print_freelist();
   return new;
 }
 
@@ -195,9 +197,7 @@ void my_free(void* ptr)
   metadata_t *buddy = find_buddy(md);
 
   int fl_index = 0;
-  while (!buddy->in_use &&
-         md->size == buddy->size) {
-   
+  while (buddy && !buddy->in_use) {
     fl_index = get_index(buddy->size);
 
     if (buddy->next == NULL && buddy->prev == NULL) {
@@ -218,7 +218,6 @@ void my_free(void* ptr)
     }
     md->size *= 2;
     buddy = find_buddy(md);
-
   }
 
   while (m_size < md->size) {
@@ -238,7 +237,8 @@ void my_free(void* ptr)
 metadata_t* find_buddy(metadata_t* ptr){
   int buddy = (int) ptr ^ ptr->size;
   metadata_t *b = (metadata_t *) buddy;
-  return b;
+  if (ptr->size == b->size) return b;
+  else return NULL;
 }
 
 void* my_memcpy(void* dest, const void* src, size_t num_bytes)
