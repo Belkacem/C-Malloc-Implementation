@@ -54,23 +54,40 @@ metadata_t* freelist[8];
 
 void* my_malloc(size_t size)
 {
+  /* Size of memory needed */
   int needed = size + sizeof(metadata_t);
   
+  /* if they request more than 2kb return NULL. */
   if (needed > 2048) return NULL; 
+
+  /* If the heap doesn't exist initialize it. If it still 
+     doesn't exist after initialization it failed so 
+     return NULL */
   if (!heap) init_heap();
   if (!heap) return NULL;
 
+  /* Get the index of the freelist we need based on the
+     needed size */
   int index = get_index(needed);
 
+  /* Declares variables for the front of the freelist
+     and the next */
   metadata_t *front, *next;
+
+  /* If there's a block of memory of that size in the
+     freelist get it and return it */
   if (freelist[index]) {
     front = freelist[index];
     next = front->next;
     
+    /* Set to to in_use, remove its next and prev */
     front->in_use = 1;
     front->next = NULL;
     front->prev = NULL;
 
+    /* If there is a next block in the freelis remove 
+       its previous and set the front of the list to it
+       else there's nothing in the list */
     if (next) {
       next->prev = NULL;
       freelist[index] = next;
@@ -78,57 +95,88 @@ void* my_malloc(size_t size)
       freelist[index] = NULL;
     }
     
+    /* Return the pointer + 12 bytes for the metadata */
     return offset_pointer(front, 1);
   }
 
+  /* If we are here that means there's no block of memory
+     of our size in the freelist */
+
+  /* Get the next largest block of memory in the freelist */
   int available = index;
   while (!freelist[available]) {
     available++;
   }
 
+  /* If there are no more blocks of free memory in the list
+     get more from my_sbrk */
   if (available == 8) {
     metadata_t *new_heap = my_sbrk(SBRK_SIZE);
+
+    // If it's null then my_sbrk errored
     if (!new_heap) return NULL;
+
+    // Initialize the vales
     new_heap->in_use = 0;
     new_heap->size = 2048;
     new_heap->next = NULL;
     new_heap->prev = NULL;
+
+    // If there's something at freelist[7] set it two next
+    // else set it to the front
     if (freelist[7]) freelist[7]->next = new_heap;
     else freelist[7] = new_heap;
     available--;
   }
-  
+ 
+  /* Declares variables for the new pointers we'll need */
   metadata_t *current, *new;
+
+  /* While the available isn't the index, keep breaking down
+     blocks of memory until you have one at the index you want */
   while (available != index) {
     current = freelist[available];
-    current->size /= 2;
+    current->size /= 2; // split in half
 
+    /* Create a new block at an address that is <size> away
+       from current */
     new = (metadata_t *) ((char *) current + current->size);
     new->size = current->size;
 
+    /* If there's something else in the linked list move it to
+       the front otherwise set it to NULL */
     if (freelist[available]->next) {
       freelist[available] = freelist[available]->next;
       freelist[available]->prev = NULL;
     } else {
       freelist[available] = NULL;
     }
+
+    // Decrement available
     --available;
 
+    /* Set up the linked lists for the new block. */
     current->next = new;
     new->prev = current;
     freelist[available] = current;
   }
 
+  /* Get the block we want to return from the freelist */
   metadata_t *ret_meta = freelist[index];
+
+  /* If there's a next move it up, else set the index to NULL */
   if (freelist[index]->next) {
     freelist[index] = freelist[index]->next;
     freelist[index]->prev = NULL;
   } else {
     freelist[index] = NULL;
   }
+
+  /* Set the values in the return block */
   ret_meta->next = NULL;
   ret_meta->in_use = 1;
 
+  /* Return the block offset by sizeof(metadata) from the start */
   return offset_pointer(ret_meta, 1);
 }
 
