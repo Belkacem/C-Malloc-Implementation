@@ -59,13 +59,6 @@ void* my_malloc(size_t size)
   if (needed > 2048) return NULL; 
   if (!heap) init_heap();
   if (size > 1024) {
-    metadata_t *new_heap = my_sbrk(SBRK_SIZE);
-    new_heap->in_use = 0;
-    new_heap->size = 2048;
-    new_heap->next = NULL;
-    new_heap->prev = NULL;
-    if (freelist[7]) freelist[7]->next = new_heap;
-    else freelist[7] = new_heap;
   }
 
   int index = get_index(needed);
@@ -94,6 +87,16 @@ void* my_malloc(size_t size)
     available++;
   }
 
+  if (available == 8) {
+    metadata_t *new_heap = my_sbrk(SBRK_SIZE);
+    new_heap->in_use = 0;
+    new_heap->size = 2048;
+    new_heap->next = NULL;
+    new_heap->prev = NULL;
+    if (freelist[7]) freelist[7]->next = new_heap;
+    else freelist[7] = new_heap;
+    available--;
+  }
   
   metadata_t *current, *new;
   while (available != index) {
@@ -117,10 +120,16 @@ void* my_malloc(size_t size)
   }
 
   metadata_t *ret_meta = freelist[index];
-  freelist[index] = freelist[index]->next;
-  freelist[index]->prev = NULL;
+  if (freelist[index]->next) {
+    freelist[index] = freelist[index]->next;
+    freelist[index]->prev = NULL;
+  } else {
+    freelist[index] = NULL;
+  }
   ret_meta->next = NULL;
   ret_meta->in_use = 1;
+
+  fprintf(stderr, "works\n");
 
   return offset_pointer(ret_meta, 1);
 }
@@ -184,7 +193,6 @@ void* my_realloc(void* ptr, size_t new_size)
   my_memcpy(new, ptr, old->size - sizeof(metadata_t));
   my_free(ptr);
 
-  print_freelist();
   return new;
 }
 
