@@ -189,7 +189,6 @@ void my_free(void* ptr)
 {
   metadata_t *md = (metadata_t *) ((char *) ptr - sizeof(metadata_t));
 
-  int m_size = 16;
   int index = 0;
 
   md->in_use = 0;
@@ -220,10 +219,7 @@ void my_free(void* ptr)
     buddy = find_buddy(md);
   }
 
-  while (m_size < md->size) {
-    m_size *= 2;
-    index++;
-  } 
+  index = get_index(md->size);
 
   if (freelist[index]) {
     metadata_t *front = freelist[index];
