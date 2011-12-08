@@ -236,16 +236,29 @@ void print_block(metadata_t *block) {
 void* my_realloc(void* ptr, size_t new_size)
 {
   void *new;
+
+  /* If the size is 0, realloc should act like my_free
+     and return NULL */
   if (new_size == 0) {
     my_free(ptr);
     return NULL;
   }
 
+  /* Allocate the new block of memory */
   new = my_malloc(new_size);
+
+  /* If the pointer is null then realloc should just act
+     like my_malloc, so return the pointer to the new
+     block of memory */
   if (ptr == NULL) return new;
  
+  /* Get the offset of the pointer so we can get the size
+     we need to copy */
   metadata_t *old = offset_pointer(ptr, 0);
+
+  /* Copy the old (ptr) to the new with size - metadata */
   my_memcpy(new, ptr, old->size - sizeof(metadata_t));
+
   my_free(ptr);
 
   return new;
