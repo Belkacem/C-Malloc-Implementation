@@ -58,8 +58,6 @@ void* my_malloc(size_t size)
   
   if (needed > 2048) return NULL; 
   if (!heap) init_heap();
-  if (size > 1024) {
-  }
 
   int index = get_index(needed);
 
