@@ -266,11 +266,16 @@ void* my_realloc(void* ptr, size_t new_size)
 
 void my_free(void* ptr)
 {
+  /* Get the other block of memory and offset it correctly. */
   metadata_t *block = offset_pointer(ptr, 0);
-  block->in_use = 0;
+  block->in_use = 0; // no longer in use
 
+  /* Get the buddy! */
   metadata_t *buddy = find_buddy(block);
+
+  /* While buddy exists and it's not in use, merge it */
   while (buddy && !buddy->in_use) {
+    /* Modify the linked list accordingly */
     if (buddy->next && buddy->prev) {
       buddy->next->prev = buddy->prev;
       buddy->prev->next = buddy->next;
@@ -281,12 +286,21 @@ void my_free(void* ptr)
     } else {
       freelist[get_index(buddy->size)] = NULL;
     }
-
+    
+    /* If the address of buddy is lower than the block, 
+       use that one instead */
     if (buddy < block) block = buddy;
+
+    /* Double the size to account for the combination */
     block->size *= 2;
+
+    /* Find the new block's buddy */
     buddy = find_buddy(block);
   }
 
+  /* If there's something at the index position of the 
+     freelist, push it to the front, otherwise just place
+     it there */
   int index = get_index(block->size);
   if (freelist[index]) {
     metadata_t *front = freelist[index];
@@ -296,6 +310,13 @@ void my_free(void* ptr)
   freelist[index] = block;
 }
 
+/* Find the buddy for a given block. This is done fairly
+   simply. Since the address of the buddy should just be
+   size away from the block, either add or subtract that
+   depending on which buddy you have. Alternatively, you
+   could XOR the address by the size, same thing as:
+        ptr +/- (1 << log2(size))
+   Then return it. */
 metadata_t* find_buddy(metadata_t* ptr){
   int buddy = (int) ptr ^ ptr->size;
   metadata_t *b = (metadata_t *) buddy;
