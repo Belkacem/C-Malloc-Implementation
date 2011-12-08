@@ -180,6 +180,7 @@ void* my_malloc(size_t size)
   return offset_pointer(ret_meta, 1);
 }
 
+/* Initialize the heap and freelist */
 void init_heap() {
   heap = my_sbrk(SBRK_SIZE);
   freelist[7] = (metadata_t *) heap;
@@ -189,6 +190,8 @@ void init_heap() {
   freelist[7]->prev = NULL; 
 }
 
+/* Get the index needed based on the size. Loops until the
+   memory that corresponds to the index is larger than needed */
 int get_index(size_t needed) {
   int index = 0;
   int memory = 16;
@@ -200,12 +203,17 @@ int get_index(size_t needed) {
   return index;
 }
 
+/* Function to offset the pointer. Takes in a metadata_t *
+   and an int offset that determines which direction to go.
+   Returns either ptr + sizeof() if offset is 1 else
+   returns ptr - sizeof() */
 void* offset_pointer(metadata_t* ptr, int offset) {
   char *offset_ptr = (char *) ptr;
   if (offset) return offset_ptr + sizeof(metadata_t);
   else return offset_ptr - sizeof(metadata_t);
 }
 
+/* Print the freelist, for debugging */
 void print_freelist() {
   int size = 16;
   for (int i=0; i<8; i++) {
@@ -214,6 +222,7 @@ void print_freelist() {
   }
 }
 
+/* Print the metadata for the block of memory, for debugging */
 void print_block(metadata_t *block) {
   fprintf(stderr, "Printing block data\n");
   fprintf(stderr, "address: %p\n", (void *) block);
