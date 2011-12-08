@@ -188,46 +188,31 @@ void* my_realloc(void* ptr, size_t new_size)
 void my_free(void* ptr)
 {
   metadata_t *block = (metadata_t *) ((char *) ptr - sizeof(metadata_t));
-
-  int index = 0;
-
   block->in_use = 0;
 
   metadata_t *buddy = find_buddy(block);
-
-  int fl_index = 0;
   while (buddy && !buddy->in_use) {
-    fl_index = get_index(buddy->size);
-
-    if (buddy->next == NULL && buddy->prev == NULL) {
-      freelist[fl_index] = NULL;
-    }
-    
     if (buddy->next && buddy->prev) {
-      buddy->prev->next = buddy->next;
       buddy->next->prev = buddy->prev;
+      buddy->prev->next = buddy->next;
     } else if (buddy->next) {
       buddy->next->prev = NULL;
     } else if (buddy->prev) {
       buddy->prev->next = NULL;
     }
 
-    if (buddy < block) {
-      block = buddy;
-    }
+    if (buddy < block) block = buddy;
     block->size *= 2;
     buddy = find_buddy(block);
   }
 
-  index = get_index(block->size);
-
+  int index = get_index(block->size);
   if (freelist[index]) {
     metadata_t *front = freelist[index];
-    block->next = front;
     front->prev = block;
+    block->next = front;
   }
   freelist[index] = block;
-
 }
 
 metadata_t* find_buddy(metadata_t* ptr){
