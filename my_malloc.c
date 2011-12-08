@@ -86,8 +86,7 @@ void* my_malloc(size_t size)
       freelist[index] = NULL;
     }
     
-    void *repos = (void *) ((char *) front + sizeof(metadata_t));
-    return repos;
+    return offset_pointer(front, 1);
   }
 
   int available = index;
@@ -123,9 +122,7 @@ void* my_malloc(size_t size)
   ret_meta->next = NULL;
   ret_meta->in_use = 1;
 
-  void *repos = (void *) ((char *) ret_meta + sizeof(metadata_t));
-
-  return repos;
+  return offset_pointer(ret_meta, 1);
 }
 
 void init_heap() {
@@ -146,6 +143,12 @@ int get_index(size_t needed) {
   }
 
   return index;
+}
+
+void* offset_pointer(metadata_t* ptr, int offset) {
+  char *offset_ptr = (char *) ptr;
+  if (offset) return offset_ptr + sizeof(metadata_t);
+  else return offset_ptr - sizeof(metadata_t);
 }
 
 void print_freelist() {
@@ -177,7 +180,7 @@ void* my_realloc(void* ptr, size_t new_size)
   new = my_malloc(new_size);
   if (ptr == NULL) return new;
  
-  metadata_t *old = (metadata_t *) ((char *) ptr - sizeof(metadata_t));
+  metadata_t *old = offset_pointer(ptr, 0);
   my_memcpy(new, ptr, old->size - sizeof(metadata_t));
   my_free(ptr);
 
@@ -187,7 +190,7 @@ void* my_realloc(void* ptr, size_t new_size)
 
 void my_free(void* ptr)
 {
-  metadata_t *block = (metadata_t *) ((char *) ptr - sizeof(metadata_t));
+  metadata_t *block = offset_pointer(ptr, 0);
   block->in_use = 0;
 
   metadata_t *buddy = find_buddy(block);

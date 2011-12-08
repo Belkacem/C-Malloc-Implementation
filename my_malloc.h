@@ -67,4 +67,5 @@ void init_heap();
 int get_index(size_t);
 void print_freelist();
 void print_block(metadata_t*);
+void* offset_pointer(metadata_t*, int);
 #endif /* __MY_MALLOC_H__ */
