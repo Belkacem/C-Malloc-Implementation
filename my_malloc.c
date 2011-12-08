@@ -129,8 +129,6 @@ void* my_malloc(size_t size)
   ret_meta->next = NULL;
   ret_meta->in_use = 1;
 
-  fprintf(stderr, "works\n");
-
   return offset_pointer(ret_meta, 1);
 }
 
@@ -210,6 +208,8 @@ void my_free(void* ptr)
       buddy->next->prev = NULL;
     } else if (buddy->prev) {
       buddy->prev->next = NULL;
+    } else {
+      freelist[get_index(buddy->size)] = NULL;
     }
 
     if (buddy < block) block = buddy;
