@@ -57,7 +57,7 @@ void* my_malloc(size_t size)
   int needed = size + sizeof(metadata_t);
   
   if (needed > 2048) return NULL; 
-  if (!heap || size > 1024) init_heap();
+  if (!heap) init_heap();
   if (size > 1024) {
     metadata_t *new_heap = my_sbrk(SBRK_SIZE);
     new_heap->in_use = 0;
