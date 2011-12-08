@@ -58,6 +58,7 @@ void* my_malloc(size_t size)
   
   if (needed > 2048) return NULL; 
   if (!heap) init_heap();
+  if (!heap) return NULL;
 
   int index = get_index(needed);
 
@@ -87,6 +88,7 @@ void* my_malloc(size_t size)
 
   if (available == 8) {
     metadata_t *new_heap = my_sbrk(SBRK_SIZE);
+    if (!new_heap) return NULL;
     new_heap->in_use = 0;
     new_heap->size = 2048;
     new_heap->next = NULL;
