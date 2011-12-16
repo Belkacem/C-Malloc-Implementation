@@ -1,3 +1,5 @@
+# Tomer Elmalem
+
 CC = gcc
 # If you have a 64-bit computer, you may want to use this instead.
 # CC = gcc -m32
